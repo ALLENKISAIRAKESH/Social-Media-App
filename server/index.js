@@ -3,29 +3,44 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import { Server } from "socket.io";
+import { verifyToken } from "./middleware/auth.js";
 import http from "http";
+import multer from "multer";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// Configurations
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const app = express();
+app.use(express.json());
+app.use("/assets", express.static(path.join(__dirname, "public/assets")));
+
+// File Storage
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, "public/assets");
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname);
+    },
+});
+const upload = multer({ storage });
+
+// ROUTES WITH FILES
+app.post("/upload", verifyToken, upload.single("picture"), (req, res) => {
+    try {
+        return res.status(200).json("File uploaded successfully");
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 import authRoutes from "./routes/auth.js";
 import postRoutes from "./routes/posts.js";
 import userRoutes from "./routes/users.js";
 import storyRoutes from "./routes/stories.js";
 import chatRoutes from "./routes/chat.js";
-
-dotenv.config();
-
-const app = express();
-const server = http.createServer(app);
-const io = new Server(server, {
-    cors: {
-        origin: process.env.CLIENT_URL || "http://localhost:5173",
-        methods: ["GET", "POST"],
-    },
-});
-
-app.use(cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
-}));
-app.use(express.json());
-
 app.use("/auth", authRoutes);
 app.use("/posts", postRoutes);
 app.use("/users", userRoutes);

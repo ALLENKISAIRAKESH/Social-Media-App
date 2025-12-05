@@ -3,7 +3,7 @@ import User from "../models/User.js";
 
 export const createStory = async (req, res) => {
     try {
-        const { userId, mediaUrl, mediaType } = req.body;
+        const { userId, img, mediaType } = req.body;
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -12,7 +12,7 @@ export const createStory = async (req, res) => {
 
         const newStory = new Story({
             userId,
-            mediaUrl,
+            mediaUrl: img,
             mediaType,
             expiresAt,
         });
