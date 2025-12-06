@@ -1,33 +1,25 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../context/authContext";
 import axios from "axios";
 
 const Stories = () => {
     const { currentUser } = useContext(AuthContext);
 
-    // TEMPORARY DUMMY DATA
-    const stories = [
-        {
-            id: 1,
-            name: "John Doe",
-            img: "https://images.pexels.com/photos/13916254/pexels-photo-13916254.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load",
-        },
-        {
-            id: 2,
-            name: "John Doe",
-            img: "https://images.pexels.com/photos/13916254/pexels-photo-13916254.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load",
-        },
-        {
-            id: 3,
-            name: "John Doe",
-            img: "https://images.pexels.com/photos/13916254/pexels-photo-13916254.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load",
-        },
-        {
-            id: 4,
-            name: "John Doe",
-            img: "https://images.pexels.com/photos/13916254/pexels-photo-13916254.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load",
-        },
-    ];
+    const [stories, setStories] = useState([]);
+
+    useEffect(() => {
+        const fetchStories = async () => {
+            try {
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/stories`, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+                });
+                setStories(res.data);
+            } catch (err) {
+                console.log(err);
+            }
+        };
+        fetchStories();
+    }, []);
 
 
     const [file, setFile] = useState(null);
@@ -83,9 +75,9 @@ const Stories = () => {
                 <label htmlFor="storyInput" className="absolute bottom-10 left-2 text-white bg-purple-500 rounded-full w-8 h-8 flex items-center justify-center text-xl cursor-pointer">+</label>
             </div>
             {stories.map(story => (
-                <div className="flex-none w-36 h-full rounded-lg overflow-hidden relative" key={story.id}>
-                    <img src={story.img} alt="" className="w-full h-full object-cover" />
-                    <span className="absolute bottom-2 left-2 text-white font-bold text-xs">{story.name}</span>
+                <div className="flex-none w-36 h-full rounded-lg overflow-hidden relative" key={story._id}>
+                    <img src={story.img.startsWith("http") ? story.img : `${import.meta.env.VITE_API_URL}/assets/${story.img}`} alt="" className="w-full h-full object-cover" />
+                    <span className="absolute bottom-2 left-2 text-white font-bold text-xs">{story.userId.username}</span>
                 </div>
             ))}
         </div>

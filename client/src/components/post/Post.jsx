@@ -31,7 +31,7 @@ const Post = ({ post }) => {
             </div>
             <div className="my-5">
                 <p>{post.desc}</p>
-                <img src={post.img} alt="" className="w-full max-h-[500px] object-cover mt-5" />
+                {post.img && <img src={post.img.startsWith("http") ? post.img : `${import.meta.env.VITE_API_URL}/assets/${post.img}`} alt="" className="w-full max-h-[500px] object-cover mt-5" />}
             </div>
             <div className="flex items-center gap-5 text-sm">
                 <div className="flex items-center gap-2 cursor-pointer">
